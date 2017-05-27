@@ -1,7 +1,7 @@
 package com.varivoda;
 
 /**
- * Ошибки, возникающие при работе с БД
+ * Ошибки, возникающие в регистраторе событий
  */
 public class EventRegisterException extends Exception {
     
