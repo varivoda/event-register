@@ -1,7 +1,7 @@
 package com.varivoda.registrator;
 
 /**
- * Исключение, возникающие при работе регистратора событий
+ * Exception occurs in event register
  */
 public class EventRegisterException extends Exception {
     

@@ -3,16 +3,16 @@ package com.varivoda.registrator;
 import com.varivoda.event.Event;
 
 /**
- * Базовый интерфейс регистратора событий
+ * Basic interface
  */
 public interface IEventRegister {
     
     void registerEvent(Event event) throws EventRegisterException;
     
-    long getEventCountInLastMinute();
+    long getEventsCountInLastMinute();
     
-    long getEventCountInLastHour();
+    long getEventsCountInLastHour();
     
-    long getEventCountInLastDay();
+    long getEventsCountInLastDay();
 }
 

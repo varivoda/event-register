@@ -1,6 +1,6 @@
 package com.varivoda.event;
 
 /**
- * Событие в системе
+ * Event in the system
  */
 public class Event {}
