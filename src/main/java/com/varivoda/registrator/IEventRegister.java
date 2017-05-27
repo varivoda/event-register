@@ -9,10 +9,10 @@ public interface IEventRegister {
     
     void registerEvent(Event event) throws EventRegisterException;
     
-    long getEventsCountInLastMinute();
+    long getEventsCountInLastMinute() throws EventRegisterException;
     
-    long getEventsCountInLastHour();
+    long getEventsCountInLastHour() throws EventRegisterException;
     
-    long getEventsCountInLastDay();
+    long getEventsCountInLastDay() throws EventRegisterException;
 }
 
