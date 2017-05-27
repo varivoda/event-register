@@ -8,22 +8,22 @@ import java.time.LocalDateTime;
 public class Event {
     
     private final long id;
-    private final LocalDateTime initTime;
+    private final LocalDateTime startTime;
     
     public Event() {
         // Для простоты используем id 0.
         // Вообще говоря назначением уникальным id должна заниматься система, в которой они происходят
         // или же на крайний случай уникальности можно добиться сохраняя сразу в БД. (id генерятся)
         this.id = 0;
-        this.initTime = LocalDateTime.now();
+        this.startTime = LocalDateTime.now();
     }
     
     public long getId() {
         return id;
     }
     
-    public LocalDateTime getInitTime() {
-        return initTime;
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
     
 }
