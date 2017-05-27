@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
  */
 public class Event {
     
-    protected final long id;
-    protected final LocalDateTime initTime;
+    private final long id;
+    private final LocalDateTime initTime;
     
     public Event() {
         // Для простоты используем id 0.
