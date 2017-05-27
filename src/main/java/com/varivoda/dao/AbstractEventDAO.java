@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 /**
- * Interface for basic operation with database
+ * Интерфейс для базовых операций с БД
  */
 public abstract class AbstractEventDAO {
     
@@ -17,7 +17,19 @@ public abstract class AbstractEventDAO {
         this.connectionPool = new BasicDataSource();
     }
     
+    /**
+     * Сохраняет указанное событие
+     * @param event Событие, которое регестрируем
+     * @throws SQLException
+     */
     public abstract void persistEvent(Event event) throws SQLException;
     
-    public abstract long getEventsCount(LocalDateTime start, LocalDateTime end) throws SQLException;
+    /**
+     * Возвращает количество записей в указанных временный пределах
+     * @param startDateTime начальная граница
+     * @param endDateTime конечная граница
+     * @return количесвто записей
+     * @throws SQLException
+     */
+    public abstract long getEventsCount(LocalDateTime startDateTime, LocalDateTime endDateTime) throws SQLException;
 }

@@ -3,10 +3,11 @@ package com.varivoda.event;
 import java.time.LocalDateTime;
 
 /**
- * Base event class in the system
+ * Базовый класс для представления событий в системе
  */
 public class Event {
     
+    // Эти свойства задаются один раз при инициализации. Никто не должен иметь доступа к изменению этих параметров
     private final long id;
     private final LocalDateTime startTime;
     

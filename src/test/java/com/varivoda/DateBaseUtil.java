@@ -15,7 +15,6 @@ public class DateBaseUtil {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        ;
     }
     
     public long getRowCount() throws SQLException {

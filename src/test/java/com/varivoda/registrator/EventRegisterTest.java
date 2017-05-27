@@ -1,6 +1,8 @@
 package com.varivoda.registrator;
 
 import com.varivoda.DateBaseUtil;
+import com.varivoda.EventRegister;
+import com.varivoda.EventRegisterException;
 import com.varivoda.event.Event;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,14 +23,17 @@ public class EventRegisterTest {
         dateBaseUtil = new DateBaseUtil();
     }
     
+    /**
+     * Примитивнеый тест для добавления записей из нескольких потоков
+     *
+    **/
     @Test
-    public void parallel() throws Exception {
+    public void addSomeCountEventsByParallelThreads() throws Exception {
     
-        int countEvents = 1000;
+        int threadCount = 1000;
         long rowContBefore = dateBaseUtil.getRowCount();
-        System.out.printf("BEFORE %d", rowContBefore );
-    
-        for (int i = 0; i < countEvents; i++) {
+        
+        for (int i = 0; i < threadCount; i++) {
             new Thread(() -> {
                 System.out.printf("%s is ready\n", Thread.currentThread().getName());
                 while (!RUN){
@@ -52,13 +57,12 @@ public class EventRegisterTest {
     
         RUN = true;
         SECONDS.sleep(20);
+        
         long rowCount = dateBaseUtil.getRowCount();
-        System.out.printf("AFTER %d \n", rowCount);
-        Assert.assertThat((long)countEvents, is(rowCount -rowContBefore));    }
+        Assert.assertThat((long)threadCount, is(rowCount -rowContBefore));    }
     
     @Test
     public void addSomeCountEvents() throws Exception {
-    
         
         int countEvents = 10;
     

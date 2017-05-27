@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * implementation for Mysql data base
+ * Реализация для базы Mysql
  */
 public class EventDAOMySQL extends AbstractEventDAO {
     
@@ -20,20 +20,20 @@ public class EventDAOMySQL extends AbstractEventDAO {
     public static final String URL = "jdbc:mysql://localhost:3306/Event_Register?serverTimezone=GMT";
     public static final int INITIAL_SIZE = 10;
     public static final int MAX_IDLE = 1000;
-    public static final int MAX_TOTAL = 1000;
     
     private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     
     public EventDAOMySQL() {
         super();
+        // Настройки подключения
         connectionPool.setUsername(USER);
         connectionPool.setPassword(PSW);
         connectionPool.setUrl(URL);
         connectionPool.setDriverClassName("com.mysql.cj.jdbc.Driver");
         
+        // Настройки пула
         connectionPool.setInitialSize(INITIAL_SIZE);
         connectionPool.setMaxIdle(MAX_IDLE);
-        connectionPool.setMaxTotal(MAX_TOTAL);
     }
     
     @Override
@@ -56,10 +56,10 @@ public class EventDAOMySQL extends AbstractEventDAO {
     }
     
     @Override
-    public long getEventsCount(LocalDateTime start, LocalDateTime end) throws SQLException {
+    public long getEventsCount(LocalDateTime startDateTime, LocalDateTime endDateTime) throws SQLException {
         
-        String starDateTimeStr = start.format(dateTimeFormatter);
-        String endDateTimeStr = end.format(dateTimeFormatter);
+        String starDateTimeStr = startDateTime.format(dateTimeFormatter);
+        String endDateTimeStr = endDateTime.format(dateTimeFormatter);
     
         Connection connection = null;
         try {
