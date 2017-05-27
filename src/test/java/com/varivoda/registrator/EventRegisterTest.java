@@ -31,8 +31,10 @@ public class EventRegisterTest {
     public void addSomeCountEventsByParallelThreads() throws Exception {
     
         int threadCount = 1000;
+        int loopCount = 10;
         long rowContBefore = dateBaseUtil.getRowCount();
-        
+     
+        // СОздаем потоки и ждем команды RUN
         for (int i = 0; i < threadCount; i++) {
             new Thread(() -> {
                 System.out.printf("%s is ready\n", Thread.currentThread().getName());
@@ -45,8 +47,11 @@ public class EventRegisterTest {
                 }
     
                 try {
+                    // Каждый поток доабвит несколько записей
                     System.out.printf("%s is going\n", Thread.currentThread().getName());
-                    eventRegister.registerEvent(new Event());
+                    for (int j = 0; j < loopCount; j++) {
+                        eventRegister.registerEvent(new Event());
+                    }
                     System.out.printf("%s is done\n", Thread.currentThread().getName());
                     
                 } catch (EventRegisterException e) {
@@ -59,12 +64,12 @@ public class EventRegisterTest {
         SECONDS.sleep(20);
         
         long rowCount = dateBaseUtil.getRowCount();
-        Assert.assertThat((long)threadCount, is(rowCount -rowContBefore));    }
+        Assert.assertThat((long)loopCount*threadCount, is(rowCount -rowContBefore));    }
     
     @Test
     public void addSomeCountEvents() throws Exception {
         
-        int countEvents = 10;
+        int countEvents = 10000;
     
         long rowContBefore = dateBaseUtil.getRowCount();
     

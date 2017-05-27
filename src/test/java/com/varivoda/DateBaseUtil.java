@@ -11,7 +11,7 @@ public class DateBaseUtil {
     
     public DateBaseUtil() {
         try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/Event_Register?serverTimezone=GMT", "root", ",ekmrekm");
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/Event_Register?serverTimezone=GMT", "root", "psw");
         } catch (SQLException e) {
             e.printStackTrace();
         }
