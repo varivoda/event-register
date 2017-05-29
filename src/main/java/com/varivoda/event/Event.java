@@ -1,5 +1,6 @@
 package com.varivoda.event;
 
+
 import java.time.LocalDateTime;
 
 /**
@@ -16,7 +17,12 @@ public class Event {
         // Вообще говоря назначением уникальным id должна заниматься система, в которой они происходят
         // или же на крайний случай уникальности можно добиться сохраняя сразу в БД. (id генерятся)
         this.id = 0;
-        this.startTime = LocalDateTime.now();
+        startTime = LocalDateTime.now();
+    }
+    
+    public Event(long id, LocalDateTime startTime) {
+        this.id = id;
+        this.startTime = startTime;
     }
     
     public long getId() {
@@ -26,6 +32,5 @@ public class Event {
     public LocalDateTime getStartTime() {
         return startTime;
     }
-    
 }
 

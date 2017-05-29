@@ -1,30 +1,44 @@
 package com.varivoda;
 
-import com.varivoda.dao.AbstractEventDAO;
-import com.varivoda.dao.EventDAOMySQL;
 import com.varivoda.event.Event;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Выполняет регистрацию и получение данный о количестве записей
  */
 public class EventRegister implements IEventRegister {
     
-    public static final String SQL_ERROR_MSG = "SQL exception was occurred";
+    // Счетчик записей, которые были добавлены после последнего апдейта
+    private volatile int countEventsAfterLastUpdate = 0;
     
-    private AbstractEventDAO eventDAO;
+    public static final int EVENTS_COUNT_UPDATE_TRIGGER = 10_000;
+    
+    private ConcurrentLinkedDeque<Event> events;
     
     public EventRegister() {
-        this.eventDAO = new EventDAOMySQL();
+        events = new ConcurrentLinkedDeque<>();
     }
     
     public void registerEvent(Event event) throws EventRegisterException {
-        try {
-            eventDAO.persistEvent(event);
-        } catch (SQLException e) {
-            throw new EventRegisterException(SQL_ERROR_MSG, e);
+        events.add(event);
+        // Если опр. число записей ужде не было апдайта - тогда апдейтим
+        if (++countEventsAfterLastUpdate > EVENTS_COUNT_UPDATE_TRIGGER) {
+            countEventsAfterLastUpdate = 0;
+            updateEvents(1);
+        }
+    }
+    
+    /**
+     * Очищает записи, которым больше определенного кол-ва дней
+     */
+    private void updateEvents(int daysCount) {
+        LocalDateTime nowMinusDays = LocalDateTime.now().minusDays(daysCount);
+        Event event;
+        while ( (event = events.peekFirst()) != null && event.getStartTime().isBefore(nowMinusDays)) {
+            events.removeFirst();
         }
     }
     
@@ -46,12 +60,23 @@ public class EventRegister implements IEventRegister {
      * @throws EventRegisterException Возникает при некорректной работе с БД
      */
     private long getEventsCount(long secCount) throws EventRegisterException {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime before = now.minusSeconds(secCount);
-        try {
-            return eventDAO.getEventsCount(before, now);
-        } catch (SQLException e) {
-            throw new EventRegisterException(SQL_ERROR_MSG, e);
+        
+        LocalDateTime nowMinusCountSec = LocalDateTime.now().minusSeconds(secCount);
+        long count = 0;
+    
+        // Проходим элементы от хвоста к голове. Т.е. от новых к старым
+        Iterator<Event> iterator = events.descendingIterator();
+    
+        while (iterator.hasNext()) {
+            Event next = iterator.next();
+            if (next.getStartTime().isAfter(nowMinusCountSec)) {
+                count++;
+            }
+            else {
+                break;
+            }
         }
+        return count;
+        
     }
 }

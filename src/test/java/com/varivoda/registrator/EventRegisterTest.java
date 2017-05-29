@@ -1,6 +1,5 @@
 package com.varivoda.registrator;
 
-import com.varivoda.DateBaseUtil;
 import com.varivoda.EventRegister;
 import com.varivoda.EventRegisterException;
 import com.varivoda.event.Event;
@@ -8,19 +7,19 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 
 public class EventRegisterTest {
     
     private volatile boolean RUN = false;
-    private DateBaseUtil dateBaseUtil;
     private EventRegister eventRegister;
     
     @Before
     public void setUp() throws Exception {
         eventRegister = new EventRegister();
-        dateBaseUtil = new DateBaseUtil();
     }
     
     /**
@@ -29,15 +28,25 @@ public class EventRegisterTest {
     **/
     @Test
     public void addSomeCountEventsByParallelThreads() throws Exception {
+        
+        
+        long expEventsCountInLastMinute = 10_000;
+        long expEventsCountInLastHour = 10_000 + expEventsCountInLastMinute;
+        long expEventsCountInLastDay = 10_000 + expEventsCountInLastHour;
+        
+        // Создаем данные для проверки. Добавляем в азные промежутки времени по 10_000 тыс заисей
+        registerEvents(LocalDateTime.now().minusDays(2), 10_000);
+        registerEvents(LocalDateTime.now().minusHours(10), 10_000);
+        registerEvents(LocalDateTime.now().minusMinutes(30), 10_000);
+        registerEvents(LocalDateTime.now().minusSeconds(10), 10_000);
     
+        
         int threadCount = 1000;
-        int loopCount = 10;
-        long rowContBefore = dateBaseUtil.getRowCount();
+        int loopCount = 1000;
      
-        // СОздаем потоки и ждем команды RUN
+        // Нагружаем и регистрируем 1000K эвентов из параллельных потоков
         for (int i = 0; i < threadCount; i++) {
             new Thread(() -> {
-                System.out.printf("%s is ready\n", Thread.currentThread().getName());
                 while (!RUN){
                     try {
                         Thread.sleep(100);
@@ -45,14 +54,11 @@ public class EventRegisterTest {
                         e.printStackTrace();
                     }
                 }
-    
                 try {
                     // Каждый поток доабвит несколько записей
-                    System.out.printf("%s is going\n", Thread.currentThread().getName());
                     for (int j = 0; j < loopCount; j++) {
                         eventRegister.registerEvent(new Event());
                     }
-                    System.out.printf("%s is done\n", Thread.currentThread().getName());
                     
                 } catch (EventRegisterException e) {
                     e.printStackTrace();
@@ -60,24 +66,22 @@ public class EventRegisterTest {
             }).start();
         }
     
+        // Запускаем почти одновременно потоки
         RUN = true;
-        SECONDS.sleep(20);
+        // Ждем завершения
+        SECONDS.sleep(10);
         
-        long rowCount = dateBaseUtil.getRowCount();
-        Assert.assertThat((long)loopCount*threadCount, is(rowCount -rowContBefore));    }
-    
-    @Test
-    public void addSomeCountEvents() throws Exception {
-        
-        int countEvents = 10000;
-    
-        long rowContBefore = dateBaseUtil.getRowCount();
-    
-        for (int i = 0; i < countEvents; i++) {
-            eventRegister.registerEvent(new Event());
-        }
-    
-        Assert.assertThat((long)countEvents, is(dateBaseUtil.getRowCount()-rowContBefore));
-        
+        //Проверям, что кол-во записей за последние мин, час, день совпадает с ожид-ым
+        Assert.assertThat("Кол-во за посл. мин не совпадает", eventRegister.getEventsCountInLastMinute(), is((long) loopCount * threadCount + expEventsCountInLastMinute));
+        Assert.assertThat("Кол-во за посл. час не совпадает", eventRegister.getEventsCountInLastHour(), is((long) loopCount * threadCount + expEventsCountInLastHour));
+        Assert.assertThat("Кол-во за посл. день не совпадает", eventRegister.getEventsCountInLastDay(), is((long) loopCount * threadCount + expEventsCountInLastDay));
     }
+    
+    //Заполняет значения с указ. датой
+    public void registerEvents(LocalDateTime time, int count) throws EventRegisterException {
+        for (int i = 0; i < count; i++) {
+            eventRegister.registerEvent(new Event(0, time));
+        }
+    }
+    
 }
